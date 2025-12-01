@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>FCM Token – Sci Club</title>
+</head>
+<body>
+  <h1>FCM Token – Sci Club Val d'Ayas</h1>
+  <p>
+    Premi il bottone qui sotto per abilitare le notifiche e ottenere il tuo
+    <strong>device token</strong>. Copialo e incollalo nella app (Impostazioni).
+  </p>
+
+  <button id="getTokenBtn">Ottieni token</button>
+
+  <h2>Token:</h2>
+  <pre id="tokenBox" style="white-space: pre-wrap; word-break: break-all;"></pre>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import {
+      getMessaging,
+      getToken,
+      onMessage,
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging.js";
+
+    // === CONFIG FIREBASE - METTI QUI I TUOI DATI ===
+    const firebaseConfig = {
+      apiKey: "AIzaSyAoWhSFPFYQfG7qa3h9j1iO777PiqujP4E",
+      authDomain: "app-sci-club.firebaseapp.com",
+      projectId: "app-sci-club",
+      storageBucket: "app-sci-club.firebasestorage.app",
+      messagingSenderId: "343564256746",
+      appId: "1:343564256746:web:dc0c5b54ebfe98bcc71e93",
+    };
+
+
+
+
+
+};
+    // Chiave pubblica Web Push (VAPID)
+    const vapidKey = "BA-pJr_qJQE6h_gUFEf4P7CS9CuGvRo2gzRW8pHz-7S9yPw_IWPNmVEC0I3k3u5MaSZ4rDoFeI6Qf4KvFolyc9U";
+
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+
+    const tokenBox = document.getElementById("tokenBox");
+    const btn = document.getElementById("getTokenBtn");
+
+    async function requestPermissionAndGetToken() {
+      try {
+        const registration = await navigator.serviceWorker.register(
+          "/firebase-messaging-sw.js"
+        );
+
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+          tokenBox.textContent = "Permesso notifiche negato.";
+          return;
+        }
+
+        const token = await getToken(messaging, {
+          vapidKey,
+          serviceWorkerRegistration: registration,
+        });
+
+        if (!token) {
+          tokenBox.textContent = "Nessun token generato.";
+          return;
+        }
+
+        tokenBox.textContent = token;
+        console.log("FCM token:", token);
+      } catch (err) {
+        console.error(err);
+        tokenBox.textContent = "Errore: " + err;
+      }
+    }
+
+    btn.addEventListener("click", () => {
+      if (!("serviceWorker" in navigator)) {
+        tokenBox.textContent = "Service worker non supportato in questo browser.";
+        return;
+      }
+      requestPermissionAndGetToken();
+    });
+
+    onMessage(messaging, (payload) => {
+      console.log("Messaggio in foreground", payload);
+    });
+  </script>
+</body>
+</html>
