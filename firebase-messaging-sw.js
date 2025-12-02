@@ -1,29 +1,28 @@
-// firebase-messaging-sw.js
-// Service worker per FCM – Sci Club Val d'Ayas
+// Service Worker FCM – Sci Club Val d'Ayas
 
 importScripts("https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js");
 
-// STESSA CONFIG CHE HAI IN token.html
+// Config identico al token.html
 firebase.initializeApp({
-  apiKey: "TODO_API_KEY",
-  authDomain: "TODO_PROJECT_ID.firebaseapp.com",
-  projectId: "TODO_PROJECT_ID",
-  storageBucket: "TODO_PROJECT_ID.appspot.com",
-  messagingSenderId: "TODO_SENDER_ID",
-  appId: "TODO_APP_ID",
+  apiKey: "AIzaSyAoWhSFPFYQfG7qa3h9j1iO777PiqujP4E",
+  authDomain: "app-sci-club.firebaseapp.com",
+  projectId: "app-sci-club",
+  storageBucket: "app-sci-club.firebasestorage.app",
+  messagingSenderId: "343564256746",
+  appId: "1:343564256746:web:dc0c5b54ebfe98bcc71e93"
 });
 
-// Inizializza messaging
 const messaging = firebase.messaging();
 
-// Gestione notifiche in background
+// Notifiche quando l’app è chiusa
 messaging.onBackgroundMessage((payload) => {
-  console.log("Messaggio FCM in background: ", payload);
-  const notificationTitle = payload.notification?.title || "Sci Club";
-  const notificationOptions = {
+  console.log("Messaggio ricevuto in background:", payload);
+
+  const title = payload.notification?.title || "Sci Club";
+  const options = {
     body: payload.notification?.body || "",
   };
 
-  self.registration.showNotification(notificationTitle, notificationOptions);
+  self.registration.showNotification(title, options);
 });
